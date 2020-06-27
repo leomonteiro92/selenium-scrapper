@@ -9,6 +9,8 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+DEFAULT_TIMEOUT = 120
+
 class CreciSpider(scrapy.Spider):
     name = 'creciSpider'
     start_urls = ['https://servico.creci-rj.gov.br/spw/ConsultaCadastral/TelaConsultaPubCompleta.aspx']
@@ -34,32 +36,32 @@ class CreciSpider(scrapy.Spider):
         cidade.send_keys("RIO DE JANEIRO")
 
         try:
-            selectedCidade = WebDriverWait(self.driver, 10).until(
+            selectedCidade = WebDriverWait(self.driver, DEFAULT_TIMEOUT).until(
                 EC.element_to_be_clickable((By.ID, 'ContentPlaceHolder1_Callbackconsulta_cboCidade_DDD_L_LBI370T0'))
             )
             selectedCidade.click()
 
-            WebDriverWait(self.driver, 60).until(
+            WebDriverWait(self.driver, DEFAULT_TIMEOUT).until(
                 EC.invisibility_of_element((By.XPATH, "//div[@class='spinner']"))
             )
 
             pesquisarBtn = self.driver.find_element_by_id('ContentPlaceHolder1_Callbackconsulta_btnConsultaTotal')
             pesquisarBtn.click()
 
-            WebDriverWait(self.driver, 60).until(
+            WebDriverWait(self.driver, DEFAULT_TIMEOUT).until(
                 EC.invisibility_of_element((By.XPATH, "//div[@class='spinner']"))
             )
 
             rowsPerPage = self.driver.find_element_by_id("ContentPlaceHolder1_Callbackconsulta_gridConsulta_DXPagerBottom_DDB")
             rowsPerPage.click()
 
-            comboRowsPerPage = WebDriverWait(self.driver, 60).until(
+            comboRowsPerPage = WebDriverWait(self.driver, DEFAULT_TIMEOUT).until(
                 EC.presence_of_element_located((By.ID, "ContentPlaceHolder1_Callbackconsulta_gridConsulta_DXPagerBottom_PSP_DXME_"))
             )
             select200 = comboRowsPerPage.find_element_by_xpath('//li[div[span[contains(text(), "200")]]]')
             select200.click()
 
-            WebDriverWait(self.driver, 60).until(
+            WebDriverWait(self.driver, DEFAULT_TIMEOUT).until(
                 EC.invisibility_of_element((By.XPATH, "//div[@class='spinner']"))
             )
 
@@ -78,7 +80,7 @@ class CreciSpider(scrapy.Spider):
                         'situacao': values[4].text
                     }
                 rowsPerPage.click()
-                WebDriverWait(self.driver, 60).until(
+                WebDriverWait(self.driver, DEFAULT_TIMEOUT).until(
                     EC.invisibility_of_element((By.XPATH, "//div[@class='spinner']"))
                 )
                 imgNext = self.driver.find_element_by_xpath("//img[@class='dxWeb_pNext_MetropolisBlue']")
