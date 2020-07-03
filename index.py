@@ -1,10 +1,8 @@
 #pylint: disable=too-many-function-args
 import scrapy
-import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,18 +14,26 @@ class CreciSpider(scrapy.Spider):
     start_urls = ['https://servico.creci-rj.gov.br/spw/ConsultaCadastral/TelaConsultaPubCompleta.aspx']
 
     def __init__(self):
+        profile = webdriver.FirefoxProfile()
+        profile.accept_untrusted_certs = True
+        profile.assume_untrusted_cert_issuer = False
+        profile.set_preference('security.tls.version.max', 2)
+        profile.set_preference('security.tls.version.min', 1)
         cap = DesiredCapabilities().FIREFOX
         cap["marionete"] = False
         opts = Options()
         opts.headless = True
-        self.driver = webdriver.Firefox(capabilities=cap, options=opts)
+        self.driver = webdriver.Firefox(
+            firefox_profile=profile,
+            capabilities=cap,
+            options=opts
+        )
 
     def parse(self, response):
         self.driver.get(response.url)
 
         tipoPesquisa = self.driver.find_element_by_id('cbousuario_I')
         tipoPesquisa.send_keys("Profissional")
-
 
         tipoBusca = self.driver.find_element_by_id('ContentPlaceHolder1_Callbackconsulta_cboTipoBusca_I')
         tipoBusca.send_keys("Num. Registro")
